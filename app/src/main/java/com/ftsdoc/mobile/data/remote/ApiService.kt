@@ -10,7 +10,7 @@ import retrofit2.http.Part
 import retrofit2.http.Url
 
 /**
- * Авторизация: GET {адрес}/import/authorization/ , заголовок Basic.
+ * Авторизация: POST {адрес}/import/authorization/ , заголовок Basic.
  * Код 200 — вход выполнен.
  *
  * Отправка: POST multipart/form-data на {адрес}/import/docs/
@@ -22,7 +22,7 @@ import retrofit2.http.Url
  * { "documents_count": 0, "pages_count": 0 }
  */
 interface ApiService {
-    @GET
+    @POST
     suspend fun authorize(@Url url: String): Response<ResponseBody>
 
     @Multipart

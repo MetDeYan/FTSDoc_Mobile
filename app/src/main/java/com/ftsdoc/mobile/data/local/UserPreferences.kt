@@ -39,7 +39,6 @@ class UserPreferences(context: Context) {
             name = prefs[Keys.ORG_NAME].orEmpty(),
             organizationId = prefs[Keys.ORG_ID].orEmpty(),
             serverUrl = prefs[Keys.SERVER_URL] ?: DEFAULT_SERVER_URL,
-            operatorName = prefs[Keys.OPERATOR].orEmpty(),
         )
     }
 
@@ -75,7 +74,7 @@ class UserPreferences(context: Context) {
             prefs[Keys.ORG_NAME] = settings.name.trim()
             prefs[Keys.ORG_ID] = settings.organizationId.trim()
             prefs[Keys.SERVER_URL] = settings.serverUrl.trim()
-            prefs[Keys.OPERATOR] = settings.operatorName.trim()
+            prefs.remove(Keys.OPERATOR)
         }
     }
 

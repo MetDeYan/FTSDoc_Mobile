@@ -149,15 +149,6 @@ fun SettingsScreen(
                 )
             },
         )
-        OutlinedTextField(
-            value = state.operatorName,
-            onValueChange = viewModel::onOperatorChange,
-            modifier = Modifier.fillMaxWidth(),
-            label = { Text("Имя оператора") },
-            singleLine = true,
-            enabled = !state.isSaving,
-            supportingText = { Text("Необязательно") },
-        )
         state.message?.let { message ->
             StatusBanner(
                 text = message,

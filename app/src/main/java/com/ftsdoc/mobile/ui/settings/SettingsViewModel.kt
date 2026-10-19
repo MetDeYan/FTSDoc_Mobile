@@ -21,7 +21,6 @@ data class SettingsUiState(
     val name: String = "",
     val organizationId: String = "",
     val serverUrl: String = "",
-    val operatorName: String = "",
     val useStubApi: Boolean = true,
     val nameError: Boolean = false,
     val idError: Boolean = false,
@@ -47,7 +46,6 @@ class SettingsViewModel(
                     name = settings.name,
                     organizationId = settings.organizationId,
                     serverUrl = settings.serverUrl,
-                    operatorName = settings.operatorName,
                 )
             }
         }
@@ -64,8 +62,6 @@ class SettingsViewModel(
 
     fun onServerUrlChange(value: String) = clearMessage { it.copy(serverUrl = value, urlError = false) }
 
-    fun onOperatorChange(value: String) = clearMessage { it.copy(operatorName = value) }
-
     fun onStubChanged(enabled: Boolean) {
         _state.update { it.copy(useStubApi = enabled) }
         viewModelScope.launch {
@@ -80,7 +76,6 @@ class SettingsViewModel(
             name = snapshot.name,
             organizationId = snapshot.organizationId,
             serverUrl = snapshot.serverUrl,
-            operatorName = snapshot.operatorName,
         )
         val errors = SettingsValidator.validate(settings)
         if (errors.hasAny) {

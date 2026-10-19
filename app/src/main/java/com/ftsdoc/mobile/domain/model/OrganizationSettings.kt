@@ -6,5 +6,4 @@ data class OrganizationSettings(
     val name: String = "",
     val organizationId: String = "",
     val serverUrl: String = DEFAULT_SERVER_URL,
-    val operatorName: String = "",
 )
