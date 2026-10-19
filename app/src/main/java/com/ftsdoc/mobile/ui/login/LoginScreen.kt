@@ -196,9 +196,6 @@ private fun LoginContent(
                         singleLine = true,
                         enabled = !state.isLoading,
                         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-                        supportingText = {
-                            Text("База 1С без /import/. Для эмулятора замените localhost на 10.0.2.2")
-                        },
                     )
                 }
                 Row(

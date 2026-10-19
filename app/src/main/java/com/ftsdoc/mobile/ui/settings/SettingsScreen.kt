@@ -153,15 +153,6 @@ fun SettingsScreen(
             enabled = !state.isSaving,
             isError = state.urlError,
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri),
-            supportingText = {
-                Text(
-                    if (state.urlError) {
-                        "Укажите адрес вида http://сервер или https://сервер"
-                    } else {
-                        "Без /import/docs/. Для эмулятора: https://10.0.2.2:443/dev010AI/hs"
-                    },
-                )
-            },
         )
         state.message?.let { message ->
             StatusBanner(
@@ -187,7 +178,6 @@ fun SettingsScreen(
             }
         }
 
-        SectionTitle("Сессия")
         OutlinedButton(
             onClick = { confirmLogout = true },
             modifier = Modifier.fillMaxWidth(),
