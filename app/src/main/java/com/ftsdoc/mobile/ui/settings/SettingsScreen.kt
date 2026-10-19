@@ -131,6 +131,20 @@ fun SettingsScreen(
             },
         )
         OutlinedTextField(
+            value = state.userId,
+            onValueChange = viewModel::onUserIdChange,
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("ID пользователя") },
+            singleLine = true,
+            enabled = !state.isSaving,
+            isError = state.userIdError,
+            supportingText = if (state.userIdError) {
+                { Text("Укажите ID пользователя") }
+            } else {
+                null
+            },
+        )
+        OutlinedTextField(
             value = state.serverUrl,
             onValueChange = viewModel::onServerUrlChange,
             modifier = Modifier.fillMaxWidth(),

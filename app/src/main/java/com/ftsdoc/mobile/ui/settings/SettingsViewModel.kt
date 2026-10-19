@@ -20,10 +20,12 @@ data class SettingsUiState(
     val initialized: Boolean = false,
     val name: String = "",
     val organizationId: String = "",
+    val userId: String = "",
     val serverUrl: String = "",
     val useStubApi: Boolean = true,
     val nameError: Boolean = false,
     val idError: Boolean = false,
+    val userIdError: Boolean = false,
     val urlError: Boolean = false,
     val isSaving: Boolean = false,
     val message: String? = null,
@@ -45,6 +47,7 @@ class SettingsViewModel(
                     initialized = true,
                     name = settings.name,
                     organizationId = settings.organizationId,
+                    userId = settings.userId,
                     serverUrl = settings.serverUrl,
                 )
             }
@@ -59,6 +62,8 @@ class SettingsViewModel(
     fun onNameChange(value: String) = clearMessage { it.copy(name = value, nameError = false) }
 
     fun onIdChange(value: String) = clearMessage { it.copy(organizationId = value, idError = false) }
+
+    fun onUserIdChange(value: String) = clearMessage { it.copy(userId = value, userIdError = false) }
 
     fun onServerUrlChange(value: String) = clearMessage { it.copy(serverUrl = value, urlError = false) }
 
@@ -75,6 +80,7 @@ class SettingsViewModel(
         val settings = OrganizationSettings(
             name = snapshot.name,
             organizationId = snapshot.organizationId,
+            userId = snapshot.userId,
             serverUrl = snapshot.serverUrl,
         )
         val errors = SettingsValidator.validate(settings)
@@ -83,6 +89,7 @@ class SettingsViewModel(
                 it.copy(
                     nameError = errors.name,
                     idError = errors.organizationId,
+                    userIdError = errors.userId,
                     urlError = errors.serverUrl,
                     message = null,
                 )

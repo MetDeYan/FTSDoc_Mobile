@@ -7,7 +7,6 @@ import com.ftsdoc.mobile.domain.model.UploadResult
 import com.ftsdoc.mobile.domain.model.UserMessageException
 import kotlinx.coroutines.flow.first
 import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.MultipartBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class RemoteDocumentDataSource(
@@ -20,16 +19,12 @@ class RemoteDocumentDataSource(
         if (!ServerEndpoints.isValidBase(settings.serverUrl)) {
             throw UserMessageException("Укажите адрес сервера в настройках организации")
         }
-        val parts = listOf(
-            MultipartBody.Part.createFormData("document_name", upload.documentName),
-            MultipartBody.Part.createFormData("document_type", upload.documentType.code),
-            MultipartBody.Part.createFormData(
-                "files",
-                null,
-                uploadBodyBuilder.filesJson(upload.files).toRequestBody(JSON),
-            ),
-        )
-        val response = api.uploadDocument(ServerEndpoints.documents(settings.serverUrl), parts)
+        val body = uploadBodyBuilder.documentJson(
+            upload = upload,
+            organizationId = settings.organizationId,
+            userId = settings.userId,
+        ).toRequestBody(JSON)
+        val response = api.uploadDocument(ServerEndpoints.documents(settings.serverUrl), body)
         if (!response.isSuccessful) {
             val raw = response.errorBody()?.string()
             throw httpError(

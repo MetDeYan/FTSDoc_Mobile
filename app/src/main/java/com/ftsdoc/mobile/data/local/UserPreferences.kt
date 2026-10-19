@@ -38,6 +38,7 @@ class UserPreferences(context: Context) {
         OrganizationSettings(
             name = prefs[Keys.ORG_NAME].orEmpty(),
             organizationId = prefs[Keys.ORG_ID].orEmpty(),
+            userId = prefs[Keys.USER_ID].orEmpty(),
             serverUrl = prefs[Keys.SERVER_URL] ?: DEFAULT_SERVER_URL,
         )
     }
@@ -73,6 +74,7 @@ class UserPreferences(context: Context) {
         store.edit { prefs ->
             prefs[Keys.ORG_NAME] = settings.name.trim()
             prefs[Keys.ORG_ID] = settings.organizationId.trim()
+            prefs[Keys.USER_ID] = settings.userId.trim()
             prefs[Keys.SERVER_URL] = settings.serverUrl.trim()
             prefs.remove(Keys.OPERATOR)
         }
@@ -103,6 +105,7 @@ class UserPreferences(context: Context) {
         val PASSWORD = stringPreferencesKey("password")
         val ORG_NAME = stringPreferencesKey("org_name")
         val ORG_ID = stringPreferencesKey("org_id")
+        val USER_ID = stringPreferencesKey("user_id")
         val SERVER_URL = stringPreferencesKey("server_url")
         val OPERATOR = stringPreferencesKey("operator_name")
         val USE_STUB = booleanPreferencesKey("use_stub_api")

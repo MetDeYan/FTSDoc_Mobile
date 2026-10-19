@@ -14,9 +14,10 @@ data class LoginErrors(
 data class SettingsErrors(
     val name: Boolean,
     val organizationId: Boolean,
+    val userId: Boolean,
     val serverUrl: Boolean,
 ) {
-    val hasAny: Boolean get() = name || organizationId || serverUrl
+    val hasAny: Boolean get() = name || organizationId || userId || serverUrl
 }
 
 data class DocumentErrors(
@@ -41,6 +42,7 @@ object SettingsValidator {
         return SettingsErrors(
             name = settings.name.isBlank(),
             organizationId = settings.organizationId.isBlank(),
+            userId = settings.userId.isBlank(),
             serverUrl = !ServerEndpoints.isValidBase(settings.serverUrl),
         )
     }

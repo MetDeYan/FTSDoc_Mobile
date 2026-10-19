@@ -21,12 +21,14 @@ class ValidatorsTest {
         )
         assertTrue(errors.name)
         assertTrue(errors.organizationId)
+        assertTrue(errors.userId)
         assertTrue(errors.serverUrl)
         assertFalse(
             SettingsValidator.validate(
                 OrganizationSettings(
                     name = "Орг",
                     organizationId = "10",
+                    userId = "42",
                     serverUrl = "https://10.0.2.2:443/dev010AI/hs",
                 ),
             ).hasAny,
