@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.Button
@@ -30,7 +32,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ftsdoc.mobile.domain.model.DocumentStatistics
-import com.ftsdoc.mobile.domain.model.StatsSource
 import com.ftsdoc.mobile.ui.LocalAppContainer
 import com.ftsdoc.mobile.ui.common.BannerTone
 import com.ftsdoc.mobile.ui.common.StatusBanner
@@ -93,46 +94,55 @@ private fun StatisticsContent(
                 CircularProgressIndicator()
             }
         } else {
-            if (state.isLoading) {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
-            }
-            val stats = state.statistics
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            Column(
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(rememberScrollState()),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
-                StatCard(
-                    title = "Документы",
-                    value = stats?.documentsCount ?: 0,
-                    modifier = Modifier.weight(1f),
-                )
-                StatCard(
-                    title = "Страницы",
-                    value = stats?.pagesCount ?: 0,
-                    modifier = Modifier.weight(1f),
-                )
-            }
-            stats?.let {
-                val source = if (it.source == StatsSource.REMOTE) {
-                    "Данные с сервера"
-                } else {
-                    "Данные этого устройства"
+                if (state.isLoading) {
+                    LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+                }
+                val stats = state.statistics
+                stats?.serverText?.takeIf { it.isNotBlank() }?.let { text ->
+                    Card(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = text,
+                            modifier = Modifier.padding(16.dp),
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    }
                 }
                 Text(
-                    text = source,
+                    text = "Данные этого устройства",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-            }
-            stats?.notice?.let { notice ->
-                StatusBanner(text = notice, tone = BannerTone.Info)
-            }
-            state.error?.let { message ->
-                StatusBanner(text = message, tone = BannerTone.Error)
-            }
-            Button(onClick = onRefresh, enabled = !state.isLoading) {
-                Icon(Icons.Filled.Refresh, contentDescription = null)
-                Text("Обновить", modifier = Modifier.padding(start = 8.dp))
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                ) {
+                    StatCard(
+                        title = "Документы",
+                        value = stats?.documentsCount ?: 0,
+                        modifier = Modifier.weight(1f),
+                    )
+                    StatCard(
+                        title = "Страницы",
+                        value = stats?.pagesCount ?: 0,
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                stats?.notice?.let { notice ->
+                    StatusBanner(text = notice, tone = BannerTone.Info)
+                }
+                state.error?.let { message ->
+                    StatusBanner(text = message, tone = BannerTone.Error)
+                }
+                Button(onClick = onRefresh, enabled = !state.isLoading) {
+                    Icon(Icons.Filled.Refresh, contentDescription = null)
+                    Text("Обновить", modifier = Modifier.padding(start = 8.dp))
+                }
             }
         }
     }
@@ -175,7 +185,12 @@ private fun StatisticsPreview() {
                 statistics = DocumentStatistics(
                     documentsCount = 12,
                     pagesCount = 37,
-                    source = StatsSource.LOCAL,
+                    serverText = "ООО \"Митрида\", за Октябрь 2026:\n" +
+                        "Количество документов — 0\n" +
+                        "Количество страниц — 0\n" +
+                        "Метелица Денис, за Октябрь 2026:\n" +
+                        "Количество документов — 0\n" +
+                        "Количество страниц — 0",
                     notice = "Локальный режим. Показаны данные этого устройства.",
                 ),
             ),

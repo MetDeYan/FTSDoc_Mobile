@@ -10,4 +10,5 @@ data class DocumentStatistics(
     val pagesCount: Int = 0,
     val source: StatsSource = StatsSource.LOCAL,
     val notice: String? = null,
+    val serverText: String? = null,
 )

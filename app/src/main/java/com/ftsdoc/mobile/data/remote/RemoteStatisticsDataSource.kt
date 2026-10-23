@@ -3,8 +3,8 @@ package com.ftsdoc.mobile.data.remote
 import com.ftsdoc.mobile.data.local.UserPreferences
 import com.ftsdoc.mobile.domain.ServerEndpoints
 import com.ftsdoc.mobile.domain.model.DocumentStatistics
-import com.ftsdoc.mobile.domain.model.StatsSource
 import com.google.gson.Gson
+import com.google.gson.JsonSyntaxException
 import com.google.gson.annotations.SerializedName
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.first
@@ -20,8 +20,17 @@ class RemoteStatisticsDataSource(
         if (!ServerEndpoints.isValidBase(settings.serverUrl)) {
             return local.copy(notice = "Адрес сервера не задан. Показаны данные этого устройства.")
         }
+        val userId = settings.userId.trim()
+        if (userId.isEmpty()) {
+            return local.copy(
+                notice = "Не задан идентификатор пользователя. Показаны данные этого устройства.",
+            )
+        }
         return try {
-            val response = api.statistics(ServerEndpoints.statistics(settings.serverUrl))
+            val response = api.statistics(
+                ServerEndpoints.statistics(settings.serverUrl),
+                userId,
+            )
             if (!response.isSuccessful) {
                 response.errorBody()?.close()
                 response.body()?.close()
@@ -30,15 +39,12 @@ class RemoteStatisticsDataSource(
                 )
             } else {
                 val raw = response.body()?.string().orEmpty()
-                val dto = gson.fromJson(raw, StatisticsDto::class.java)
-                if (dto == null) {
-                    local.copy(notice = "Сервер вернул пустой ответ. Показаны данные этого устройства.")
-                } else {
-                    DocumentStatistics(
-                        documentsCount = dto.documentsCount,
-                        pagesCount = dto.pagesCount,
-                        source = StatsSource.REMOTE,
-                    )
+                when (val parsed = parseStatisticsText(raw, gson)) {
+                    is StatisticsTextParse.Text -> local.copy(serverText = parsed.value)
+                    StatisticsTextParse.Empty ->
+                        local.copy(notice = "Сервер вернул пустой ответ. Показаны данные этого устройства.")
+                    StatisticsTextParse.Invalid ->
+                        local.copy(notice = "Сервер вернул некорректный ответ. Показаны данные этого устройства.")
                 }
             }
         } catch (error: CancellationException) {
@@ -49,10 +55,28 @@ class RemoteStatisticsDataSource(
     }
 }
 
-private class StatisticsDto {
-    @SerializedName("documents_count")
-    var documentsCount: Int = 0
+internal sealed class StatisticsTextParse {
+    data class Text(val value: String) : StatisticsTextParse()
+    data object Empty : StatisticsTextParse()
+    data object Invalid : StatisticsTextParse()
+}
 
-    @SerializedName("pages_count")
-    var pagesCount: Int = 0
+internal fun parseStatisticsText(raw: String, gson: Gson): StatisticsTextParse {
+    if (raw.isBlank()) return StatisticsTextParse.Empty
+    val dto = try {
+        gson.fromJson(raw, StatisticsDto::class.java)
+    } catch (_: JsonSyntaxException) {
+        return StatisticsTextParse.Invalid
+    } ?: return StatisticsTextParse.Empty
+    val text = dto.statistics
+        ?.replace("\r\n", "\n")
+        ?.replace('\r', '\n')
+        ?.trim()
+        .orEmpty()
+    return if (text.isEmpty()) StatisticsTextParse.Empty else StatisticsTextParse.Text(text)
+}
+
+private class StatisticsDto {
+    @SerializedName("statistics")
+    var statistics: String? = null
 }

@@ -7,6 +7,7 @@ import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.POST
+import retrofit2.http.Query
 import retrofit2.http.Url
 
 /**
@@ -23,8 +24,8 @@ import retrofit2.http.Url
  *   "user_id": "..."
  * }
  *
- * Статистика: GET {адрес}/import/statistics/
- * { "documents_count": 0, "pages_count": 0 }
+ * Статистика: GET {адрес}/import/statistics/?id_user={ид пользователя}
+ * { "statistics": "ООО \"Пример\", за Октябрь 2026:\nКоличество документов — 0\n..." }
  */
 interface ApiService {
     @POST
@@ -38,5 +39,8 @@ interface ApiService {
     ): Response<ResponseBody>
 
     @GET
-    suspend fun statistics(@Url url: String): Response<ResponseBody>
+    suspend fun statistics(
+        @Url url: String,
+        @Query("id_user") userId: String,
+    ): Response<ResponseBody>
 }
